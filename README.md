@@ -1,4 +1,4 @@
-# Confihure UAV Setup Guide
+# Configure UAV Setup Guide
 
 This guide provides step-by-step instructions for setting up Bird 3, including configuring various libraries and frameworks such as GStreamer, OpenCV, TensorRT with YOLO, PyMavlink, and others. **Note:** Replace `IP_configuration` as per your bird.
 
@@ -36,5 +36,27 @@ dpkg -l | grep gstreamer
 ### Check for NVIDIA encoder/decoder
 ```
 gst-inspect-1.0 | grep nv
+gst-inspect-1.0 nvh264enc
+```
+
+Available Plugins
+Check for available NVIDIA encoder and decoder plugins with:
+
+````bash
+gst-inspect-1.0 | grep nv
+````
+The following plugins should be available:
+
+nvh264enc
+nvh265enc
+nvh264dec
+nvh265dec
+nvv4l2h264enc
+nvv4l2h265enc
+nvv4l2decoder
+
+To inspect individual plugins, for example:
+
+```bash
 gst-inspect-1.0 nvh264enc
 ```
