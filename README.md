@@ -47,13 +47,13 @@ gst-inspect-1.0 | grep nv
 ````
 The following plugins should be available:
 
-nvh264enc
-nvh265enc
-nvh264dec
-nvh265dec
-nvv4l2h264enc
-nvv4l2h265enc
-nvv4l2decoder
+- nvh264enc
+- nvh265enc
+- nvh264dec
+- nvh265dec
+- nvv4l2h264enc
+- nvv4l2h265enc
+- nvv4l2decoder
 
 To inspect individual plugins, for example:
 
