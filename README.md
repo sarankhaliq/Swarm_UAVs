@@ -151,12 +151,12 @@ pip3 install cmake --upgrade
 ### Install Torch and Torchvision
 #### Follow the instructions from the NVIDIA documentation:
 
-- [Install PyTorch on Jetson]()
-- You must check [compatibility matrix]() as per your Jetson device, Jetpack and select Pytorch accordingly.
+- [Install PyTorch on Jetson](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html)
+- You must check [compatibility matrix](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html#pytorch-jetson-rel) as per your Jetson device, Jetpack and select Pytorch accordingly.
 
 In our case __Jetpack=5.1.1__, __Pytochv2.1__
 
-- [Install Torchvision on Jetson]()
+- [Install Torchvision on Jetson](https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048)
 
 Once pytorch is installed, you must select torchvision as per your pytorch version
 
