@@ -19,18 +19,17 @@ This guide provides step-by-step instructions for setting up Bird 3, including c
 ### Make Python3 Default:
 ```bash
 sudo ln -sf /usr/bin/python3 /usr/bin/python
-
-## **Gstreamer**
-
-**### Check if Gstreamer is Installed
-**
+````
+## Gstreamer
+### Check if Gstreamer is Installed
 To verify if Gstreamer is installed on your system, use the following commands:
 
 ```bash
 gst-launch-1.0 --gst-version
-
+````
 This will display the version of Gstreamer installed.
 
 Alternatively, you can use the following command to list all Gstreamer packages installed on your system:
-
+```bash
 dpkg -l | grep gstreamer
+```
