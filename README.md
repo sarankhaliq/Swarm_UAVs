@@ -33,3 +33,8 @@ Alternatively, you can use the following command to list all Gstreamer packages 
 ```bash
 dpkg -l | grep gstreamer
 ```
+### Check for NVIDIA encoder/decoder
+```
+gst-inspect-1.0 | grep nv
+gst-inspect-1.0 nvh264enc
+```
