@@ -1,0 +1,245 @@
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Guide for Bird 3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+        }
+        .toc {
+            margin-bottom: 20px;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Setup Guide for Bird 3</h1>
+        <h3>You must replace IP_confoigurtation as per your bird</h3>
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#pre-requisites">Pre-requisites</a></li>
+                <li><a href="#gstreamer">Gstreamer</a></li>
+                <li><a href="#opencv-with-gstreamer">Opencv with Gstreamer</a></li>
+                <li><a href="#tensorrt-and-yolo">TensorRT and Yolo</a></li>
+                <li><a href="#pymavlink">Pymavlink</a></li>
+                <li><a href="#mavproxy">Mavproxy</a></li>
+                <li><a href="#keyboard-input-library">Keyboard Input Library</a></li>
+                <li><a href="#siyi-sdk">SIYI SDK (IP Cam SDK)</a></li>
+                <li><a href="#ros">ROS</a></li>
+                <li><a href="#mavros">MAVROS</a></li>
+            </ul>
+        </div>
+
+        <h2 id="pre-requisites">Pre-requisites</h2>
+        <p>Check if CUDA is installed (Normally it comes with Jetpack).</p>
+        <p>Make Python3 the default:</p>
+        <pre><code>sudo ln -sf /usr/bin/python3 /usr/bin/python</code></pre>
+
+        <h2 id="gstreamer">Gstreamer</h2>
+        <h3>Check if Gstreamer is Installed</h3>
+        <pre><code>gst-launch-1.0 --gst-version
+dpkg -l | grep gstreamer</code></pre>
+
+        <h3>To check if a specific plugin is installed</h3>
+        <pre><code>gst-inspect-1.0 plugin_name</code></pre>
+        <p>Example:</p>
+        <pre><code>gst-inspect-1.0 pulsesink</code></pre>
+
+        <h3>Check for NVIDIA encoder/decoder</h3>
+        <pre><code>gst-inspect-1.0 | grep nv
+gst-inspect-1.0 nvh264enc</code></pre>
+
+        <h3>Available plugins:</h3>
+        <ul>
+            <li>nvh264enc</li>
+            <li>nvh265enc</li>
+            <li>nvh264dec</li>
+            <li>nvh265dec</li>
+            <li>nvv4l2h264enc</li>
+            <li>nvv4l2h265enc</li>
+            <li>nvv4l2decoder</li>
+        </ul>
+
+        <h3>Check if you can get a stream</h3>
+        <pre><code>gst-launch-1.0 rtspsrc location=rtsp://192.168.1.23:8554/main.264 latency=0 ! decodebin ! videoconvert ! autovideosink</code></pre>
+
+        <h3>Install Gstreamer and plugins</h3>
+        <pre><code>apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio</code></pre>
+
+        <h3>Reference Links:</h3>
+        <ul>
+            <li><a href="https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c" target="_blank">Installing GStreamer on Linux</a></li>
+            <li><a href="https://docs.nvidia.com/jetson/archives/r35.3.1/DeveloperGuide/text/SD/Multimedia/AcceleratedGstreamer.html" target="_blank">NVIDIA Accelerated GStreamer</a></li>
+        </ul>
+
+        <h2 id="opencv-with-gstreamer">Opencv with Gstreamer</h2>
+        <h3>Check if already Installed</h3>
+        <pre><code>import cv2
+print(cv2.getBuildInformation())</code></pre>
+
+        <h3>Remove other OpenCV installations</h3>
+        <pre><code>sudo apt-get purge *libopencv*</code></pre>
+
+        <h3>Install requirements</h3>
+        <pre><code>sudo apt-get update
+sudo apt-get install -y build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+sudo apt-get install -y python2.7-dev python3.6-dev python-dev python-numpy python3-numpy
+sudo apt-get install -y libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libdc1394-22-dev
+sudo apt-get install -y libv4l-dev v4l-utils qv4l2 v4l2ucp
+sudo apt-get install -y curl</code></pre>
+
+        <h3>Download OpenCV</h3>
+        <pre><code>mkdir workspace
+cd workspace
+curl -L https://github.com/opencv/opencv/archive/4.5.0.zip -o opencv-4.5.0.zip
+curl -L https://github.com/opencv/opencv_contrib/archive/4.5.0.zip -o opencv_contrib-4.5.0.zip
+unzip opencv-4.5.0.zip
+unzip opencv_contrib-4.5.0.zip
+cd opencv-4.5.0/</code></pre>
+
+        <h3>Start Building OpenCV</h3>
+        <pre><code>mkdir release
+cd release/
+cmake -D WITH_CUDA=ON -D WITH_CUDNN=ON -D CUDA_ARCH_BIN="5.3,6.2,7.2" -D CUDA_ARCH_PTX="" -D OPENCV_GENERATE_PKGCONFIG=ON -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.5.0/modules -D WITH_GSTREAMER=ON -D WITH_LIBV4L=ON -D BUILD_opencv_python2=ON -D BUILD_opencv_python3=ON -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_EXAMPLES=OFF -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make -j4
+sudo make install</code></pre>
+
+        <h3>Reference Link:</h3>
+        <ul>
+            <li><a href="https://github.com/AastaNV/JEP/blob/master/script/install_opencv4.5.0_Jetson.sh" target="_blank">Installing OpenCV 4.5.0 on Jetson</a></li>
+        </ul>
+
+        <h2 id="tensorrt-and-yolo">TensorRT and Yolo</h2>
+        <h3>Clone the YOLOv8 TensorRT repository</h3>
+        <pre><code>git clone https://github.com/triple-Mu/YOLOv8-TensorRT.git</code></pre>
+
+        <h3>Required Packages</h3>
+        <ul>
+            <li>numpy <= 1.23.5</li>
+            <li>Onnx</li>
+            <li>Onnxsim</li>
+            <li>Torch (Follow Instructions below) </li>
+            <li>Torchvision (Follow Instructions below)</li>
+            <li>Ultralytics</li>
+        </ul>
+
+        <h3>Install required packages</h3>
+        <pre><code>pip3 install numpy==1.23.5 onnx onnxsim
+pip3 install cmake --upgrade</code></pre>
+
+        <h3>Install Torch and Torchvision</h3>
+        <p>Follow the instructions from the NVIDIA documentation:</p>
+        <ul>
+            <li><a href="https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html" target="_blank">Install PyTorch on Jetson</a></li>
+            <p> You must check <a href="https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html#pytorch-jetson-rel" target="_blank">compatibility matrix</a>  as per your Jetson device, Jetpack and select Pytorch accordingly. 
+            </p>
+            <p>     In our case Jetpack=5.1.1, Pytochv2.1 </p>
+
+            <li><a href="https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048" target="_blank">Install Torchvision on Jetson</a></li>
+            <p> Once pytorch is installed, you must select torchvision as per your pytorch version </p>
+            <h4>PyTorch and torchvision Version Compatibility</h4>
+            <ul>
+                <li>PyTorch v1.0 - torchvision v0.2.2</li>
+                <li>PyTorch v1.1 - torchvision v0.3.0</li>
+                <li>PyTorch v1.2 - torchvision v0.4.0</li>
+                <li>PyTorch v1.3 - torchvision v0.4.2</li>
+                <li>PyTorch v1.4 - torchvision v0.5.0</li>
+                <li>PyTorch v1.5 - torchvision v0.6.0</li>
+                <li>PyTorch v1.6 - torchvision v0.7.0</li>
+                <li>PyTorch v1.7 - torchvision v0.8.1</li>
+                <li>PyTorch v1.8 - torchvision v0.9.0</li>
+                <li>PyTorch v1.9 - torchvision v0.10.0</li>
+                <li>PyTorch v1.10 - torchvision v0.11.1</li>
+                <li>PyTorch v1.11 - torchvision v0.12.0</li>
+                <li>PyTorch v1.12 - torchvision v0.13.0</li>
+                <li>PyTorch v1.13 - torchvision v0.13.0</li>
+                <li>PyTorch v1.14 - torchvision v0.14.1</li>
+                <li>PyTorch v2.0 - torchvision v0.15.1</li>
+                <li>PyTorch v2.1 - torchvision v0.16.1 <b> <=== </b> </li>
+                <li>PyTorch v2.2 - torchvision v0.17.1</li>
+                <li>PyTorch v2.3 - torchvision v0.18.0</li>
+            </ul>
+
+
+            <pre><code>sudo apt-get install libjpeg-dev zlib1g-dev libpython3-dev libopenblas-dev libavcodec-dev libavformat-dev libswscale-dev
+                git clone --branch <version> https://github.com/pytorch/vision torchvision   # see below for version of torchvision to download
+                cd torchvision
+                export BUILD_VERSION=0.x.0  # where 0.x.0 is the torchvision version  
+                python3 setup.py install --user
+                cd ../  # attempting to load torchvision from build dir will result in import error
+                pip install 'pillow<7' # always needed for Python 2.7, not needed torchvision v0.5.0+ with Python 3.6</code></pre>
+        </ul>
+
+        <h3>Convert PyTorch model to ONNX</h3>
+        <pre><code>python3 export-det.py --weights yolov8s.pt --iou-thres 0.65 --conf-thres 0.25 --topk 100 --opset 11 --sim --input-shape 1 3 640 640 --device cuda:0</code></pre>
+
+        <h3>Convert ONNX to TensorRT Engine</h3>
+        <pre><code>python3 build.py --weights yolov8s.onnx --iou-thres 0.65 --conf-thres 0.25 --topk 100 --fp16 --device cuda:0
+# or
+/usr/src/tensorrt/bin/trtexec --onnx=yolov8s.onnx --saveEngine=yolov8s.engine --fp16</code></pre>
+
+        <h3>Inference using TensorRT Engine</h3>
+        <pre><code>python3 infer-det.py --engine yolov8s.engine --imgs data --show --out-dir outputs --device cuda:0</code></pre>
+
+        <h2 id="pymavlink">Pymavlink</h2>
+        <pre><code>pip3 install pymavlink</code></pre>
+
+        <h2 id="mavproxy">Mavproxy</h2>
+        <h3>Install dependencies</h3>
+        <pre><code>sudo apt-get install python3-dev python3-wxgtk4.0 python3-pip python3-matplotlib python3-lxml python3-pygame</code></pre>
+
+        <h3>Install Mavproxy</h3>
+        <pre><code>pip3 install PyYAML mavproxy --user
+echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+
+        <h2 id="keyboard-input-library">Keyboard Input Library</h2>
+        <pre><code>pip3 install readchar</code></pre>
+
+        <h2 id="siyi-sdk">SIYI SDK (IP Cam SDK)</h2>
+        <h3>Install the SIYI SDK</h3>
+        <pre><code>pip3 install siyi-sdk==0.2.4</code></pre>
+
+        <h3>Note</h3>
+        <p>This will forcefully install <code>opencv-python==4.10.0</code>, which might not be built with GStreamer. Uninstall this if you already have one built with GStreamer:</p>
+        <pre><code>pip3 uninstall opencv-python==4.10.0</code></pre>
+
+        <h2 id="ros">ROS</h2>
+        <p>(To be added)</p>
+
+        <h2 id="mavros">MAVROS</h2>
+        <p>(To be added)</p>
+    </div>
+</body>
+</html>
